@@ -63,8 +63,6 @@ def createContest():
 
             print(pr.contestID)
         
-            
-
         return render_template("create.html")
 
 @app.route('/history')
