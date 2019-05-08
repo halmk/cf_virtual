@@ -7,7 +7,7 @@
 
          <!-- Bootstrap core CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <link href="css/create.css" rel="stylesheet">
+        <link href="{{ url_for('static', filename='create.css') }}" rel="stylesheet">
     </head>
 
     <body>
@@ -21,23 +21,23 @@
             </div>
         </header>
         <div class="container">
-        <div class="form-group">
+        <form class="form-group" action="/create" method="POST">
         <p class="label">Contest Name<span class="req">*</span></p>
-        <input type="text" id="contest-name" value="" required>
+        <input type="text" id="contest-name" value="" name="contest_name" required>
         <p class="label">Start Date<span class="req">*</span></p>
-        <input type="date" value="">
-        <input type="time" value="12:00" step="300">
+        <input type="date" value="" name="start_date">
+        <input type="time" value="12:00" step="300" name="start_time">
         <p class="label">End Date<span class="req">*</span></p>
-        <input type="date" value="">
-        <input type="time" value="12:00" step="300">
+        <input type="date" value="" name="end_date">
+        <input type="time" value="12:00" step="300" name="end_time">
         <p class="label">Problems<span class="req">*</span></p>
-        <button id="add" onclick="add();">add</button>
+        <button type="button" id="add-button" onclick="add();">add</button>
         <div id="problems">
-            <input id="problem-url" type="url" value="" placeholder="https://codeforces.com/problemset/problem/***/*" required>
+            <input id="problem-url" type="text" value="" name="problem_url" placeholder="https://codeforces.com/problemset/problem/***/*" required>
         </div>
         <button type="submit" id="sub">Create</button>
-
         </div>
+        </form>
         </div>
 
 
@@ -45,7 +45,7 @@
     <script>
         function add(){
             var div_element = document.createElement("div");
-            div_element.innerHTML = '<input id="problem-url" type="url" value="" placeholder="https://codeforces.com/problemset/problem/***/*">'
+            div_element.innerHTML = '<input id="problem-url" type="text" value="" name="problem_url" placeholder="https://codeforces.com/problemset/problem/***/*">'
             var parent_object = document.getElementById("problems");
             parent_object.appendChild(div_element);
         }

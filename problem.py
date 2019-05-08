@@ -10,7 +10,7 @@ class Problem(Base):
     """
     __tablename__ = "problems"
     id = Column('id', Integer, primary_key = True)
-    problem = Column('problem', String(100))
+    #problem = Column('problem', String(100))
     problemURL = Column('url', String(100))
     participant = ('participant', String(100))
     contest = Column('contest', String(100))
