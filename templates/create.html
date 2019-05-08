@@ -1,11 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="jp">
     <head>
-        <meta charset="UTF-8">
-        <title>コンテストの作成</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>Create Contest</title>
+
+         <!-- Bootstrap core CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link href="css/create.css" rel="stylesheet">
     </head>
 
     <body>
-        
+        <header class="masthead mb-auto">
+            <div class="inner">
+                <nav class="nav nav-masthead justify-content-left">
+                    <a class="nav-link" href="#">Codeforces Local Virtual Contest</a>
+                    <a class="nav-link" href="#">History</a>
+                    <a class="nav-link" href="#">Login</a>
+                </nav>
+            </div>
+        </header>
+        <div class="container">
+        <div class="form-group">
+        <p class="label">Contest Name<span class="req">*</span></p>
+        <input type="text" id="contest-name" value="" required>
+        <p class="label">Start Date<span class="req">*</span></p>
+        <input type="date" value="">
+        <input type="time" value="12:00" step="300">
+        <p class="label">End Date<span class="req">*</span></p>
+        <input type="date" value="">
+        <input type="time" value="12:00" step="300">
+        <p class="label">Problems<span class="req">*</span></p>
+        <button id="add" onclick="add();">add</button>
+        <div id="problems">
+            <input id="problem-url" type="url" value="" placeholder="https://codeforces.com/problemset/problem/***/*" required>
+        </div>
+        <button type="submit" id="sub">Create</button>
+
+        </div>
+        </div>
+
+
     </body>
+    <script>
+        function add(){
+            var div_element = document.createElement("div");
+            div_element.innerHTML = '<input id="problem-url" type="url" value="" placeholder="https://codeforces.com/problemset/problem/***/*">'
+            var parent_object = document.getElementById("problems");
+            parent_object.appendChild(div_element);
+        }
+    </script>
 </html>
