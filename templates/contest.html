@@ -24,22 +24,37 @@
 
         <div class="container">
             <h1>{{ cont[0].contest }}</h1>
-            <h2>{{ cont[0].start_time }}〜{{ cont[0].end_time }}</h2>
+            <h2>{{ cont[0].start_time }} 〜 {{ cont[0].end_time }}</h2>
 
             <table border="1">
                 <tr>
-                    <th>Username</th>
+                    <th>User name</th>
                     {% for co in cont %}
-                        <th>{{ co.problem }}</th>
+                        <th><a href="{{ co.problemURL }}" target="_blank">{{ co.problem }}</a></th>
                     {% endfor %}
                     <th>Score</th>
                 </tr>
                 <tr>
                     <td>{{ cont[0].participant }}</td>
                     {% for co in cont %}
-                        <td><span class="result" id="penalty">{{ co.penalty }}</span><span class="result" id="ac_time">{{ co.ac_time }}</span></td>
+                        {% if co.penalty == 0 and co.ac_time is none %}
+                        <td>-</td>
+                        {% elif co.penalty != 0 %}
+                        <td><span class="result" id="penalty">({{ co.penalty }})</span></td>
+                        {% elif co.ac_time is not none %}
+                        <td><span class="result" id="ac_time">[{{ co.ac_time }}]</span></td>
+                        {% else %}
+                        <td><span class="result" id="penalty">({{ co.penalty }})</span><span class="result" id="ac_time">[{{ co.ac_time or '' }}]</span></td>
+                        {% endif %}
                     {% endfor %}
-                    <td><span class="result" id="penalty">{{ sum_penalty }}</span><span class="result" id="ac_time">{{ sum_time }}</span></td>
+                    <td>
+                    {% if sum_time != "00:00" %}
+                    <span class="result" id="ac_time">[{{ sum_time }}]</span>
+                    {% endif %}
+                    {% if sum_penalty != 0 %}
+                    <span class="result" id="penalty">({{ sum_penalty}})</span>
+                    {% endif %}
+                    </td>
                 </tr>
             </table>
         </div>

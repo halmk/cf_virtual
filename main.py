@@ -74,7 +74,7 @@ def createContest():
 
             print(pr.contestID)
         
-        return contest(max_contestID)
+        return redirect(url_for('contest', contestID=max_contestID))
 
 @app.route('/history')
 def history():
@@ -84,7 +84,9 @@ def history():
 @app.route('/contest/<contestID>', methods=["GET","POST"])
 def contest(contestID):
     contest_ID = contestID
+    print("Getting Submmision data...")
     sub_data = getSubmissionInfo()
+    print(" -> Finish.")
     crt = time.time()
     loc = datetime.fromtimestamp(crt)
     last_updateds = session.query(pm.Problem.last_updated).filter(pm.Problem.contestID==contest_ID).all()
@@ -102,14 +104,13 @@ def contest(contestID):
 
     print(start_t)
     start_epoch = int(start_t[0].timestamp())
-    print(start_epoch)
     
     for sub in sub_data:
         sub_epochtime = sub["creationTimeSeconds"]
         sub_time = datetime.fromtimestamp(sub_epochtime)
         sub_time = sub_time.strftime('%Y-%m-%d %H:%M:%S')
-        print(sub_time)
         if sub_time > last_max:
+            print(sub_time)
             problem = str(sub["contestID"])+sub["problem"]["id"]
             update_pr = session.query(pm.Problem).filter(pm.Problem.contestID==contest_ID, pm.Problem.problem==problem).first()
             update_pr.last_updated = loc
@@ -123,9 +124,18 @@ def contest(contestID):
             
             session.commit()
 
-    content = session.query(pm.Problem).all()
+    content = session.query(pm.Problem).filter(pm.Problem.contestID==contest_ID).all()
+    sum_time = 0
+    sum_penalty = 0
+    for con in content:
+        if con.ac_time is not None:
+            sum_time += int(con.ac_time.split(':')[0])*60 + int(con.ac_time.split(':')[1])
+        sum_penalty += con.penalty
+    
+    sum_time = "{:02}:{:02}".format(sum_time//60, sum_time%60)
 
-    return render_template('contest.html', cont=content)
+    print("Complete.")
+    return render_template('contest.html', cont=content, sum_time=sum_time, sum_penalty=sum_penalty)
 
 if __name__ == "__main__":
     app.run(debug=True)
