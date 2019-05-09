@@ -1,11 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="jp">
     <head>
         <meta charset="utf-8">
-        <title>Contest</title>
+        <meta name="viewport" content="width=device-width">
+        <title>{{ title }}</title>
+
+         <!-- Bootstrap core CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link href="{{ url_for('static', filename='contest.css') }}" rel="stylesheet">
     </head>
 
     <body>
-        <h1>This contest's ID is {{id}}</h1>
+        <header class="masthead mb-auto">
+            <div class="inner">
+                <nav class="nav nav-masthead justify-content-left">
+                    <a class="nav-link" href="#">Codeforces Local Virtual Contest</a>
+                    <a class="nav-link" href="#">History</a>
+                    <a class="nav-link" href="/create">Create Contest</a>
+                    <a class="nav-link" href="#">Login</a>
+                </nav>
+            </div>
+        </header>
+
+        <div class="container">
+            <h1>{{ cont[0].contest }}</h1>
+            <h2>{{ cont[0].start_time }}〜{{ cont[0].end_time }}</h2>
+
+            <table border="1">
+                <tr>
+                    <th>Username</th>
+                    {% for co in cont %}
+                        <th>{{ co.problem }}</th>
+                    {% endfor %}
+                    <th>Score</th>
+                </tr>
+                <tr>
+                    <td>{{ cont[0].participant }}</td>
+                    {% for co in cont %}
+                        <td><span class="result" id="penalty">{{ co.penalty }}</span><span class="result" id="ac_time">{{ co.ac_time }}</span></td>
+                    {% endfor %}
+                    <td><span class="result" id="penalty">{{ sum_penalty }}</span><span class="result" id="ac_time">{{ sum_time }}</span></td>
+                </tr>
+            </table>
+        </div>
+
+
     </body>
 </html>

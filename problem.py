@@ -18,8 +18,9 @@ class Problem(Base):
     contestID = Column('contestID', Integer)
     start_time = Column('start_time', DateTime)
     end_time = Column('end_time', DateTime)
-    ac_time = Column('ac_time', DateTime)
+    ac_time = Column('ac_time', String(100))
     penalty = Column('penalty', Integer)
+    last_updated = Column('last_updated', DateTime)
 
 def main(args):
     """

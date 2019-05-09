@@ -6,8 +6,19 @@ import datetime
 import problem as pm
 import user as usr
 from setting import session
+import json
+import requests
+from datetime import datetime, date
+import time
 
 app = Flask(__name__)
+
+def getSubmissionInfo():
+    sub_url = "https://codeforces.com/api/user.status?handle=springroll&from=1&count=20"
+    response = requests.get(sub_url)
+    sub_data = json.loads(response.text)
+    return sub_data["result"]
+
 
 @app.route('/')
 def home():
@@ -45,7 +56,6 @@ def createContest():
         max_contestID = res_mx.max_contestid
         print(max_contestID)
         max_contestID += 1
-
         
         for url in problems_url:
             pr = pm.Problem()
@@ -57,13 +67,14 @@ def createContest():
             pr.start_time = start_date +" "+ start_time + ":00"
             pr.end_time = end_date +" "+ end_time + ":00"
             pr.penalty = 0
+            pr.last_updated = start_date +" "+ start_time + ":00"
 
             session.add(pr)
             session.commit()
 
             print(pr.contestID)
         
-        return render_template("create.html")
+        return contest(max_contestID)
 
 @app.route('/history')
 def history():
@@ -72,7 +83,49 @@ def history():
 
 @app.route('/contest/<contestID>', methods=["GET","POST"])
 def contest(contestID):
-    return render_template("contest.html", title=contestID,id=contestID)
+    contest_ID = contestID
+    sub_data = getSubmissionInfo()
+    crt = time.time()
+    loc = datetime.fromtimestamp(crt)
+    last_updateds = session.query(pm.Problem.last_updated).filter(pm.Problem.contestID==contest_ID).all()
+    if len(last_updateds)==0:
+        return redirect(url_for('history'))
+    
+    last_max = "1997-12-03 00:00:00"
+    for last_update in last_updateds:
+        lustr = last_update[0].strftime('%Y-%m-%d %H:%M:%S')
+        if last_max < lustr:
+            last_max = lustr
+
+    print(last_max)
+    start_t = session.query(pm.Problem.start_time).filter(pm.Problem.contestID==contest_ID).first()
+
+    print(start_t)
+    start_epoch = int(start_t[0].timestamp())
+    print(start_epoch)
+    
+    for sub in sub_data:
+        sub_epochtime = sub["creationTimeSeconds"]
+        sub_time = datetime.fromtimestamp(sub_epochtime)
+        sub_time = sub_time.strftime('%Y-%m-%d %H:%M:%S')
+        print(sub_time)
+        if sub_time > last_max:
+            problem = str(sub["contestID"])+sub["problem"]["id"]
+            update_pr = session.query(pm.Problem).filter(pm.Problem.contestID==contest_ID, pm.Problem.problem==problem).first()
+            update_pr.last_updated = loc
+            if sub["verdict"] == "OK":
+                ac_diff = sub_epochtime - start_epoch
+                ac_tm = "{:02}:{:02}".format(ac_diff//60, ac_diff%60)
+                update_pr.ac_time = ac_tm
+            else:
+                update_pr = session.query(pm.Problem).filter(pm.Problem.contestID==contest_ID, pm.Problem.problem==problem).first()
+                update_pr.penalty = update_pr.penalty + 1
+            
+            session.commit()
+
+    content = session.query(pm.Problem).all()
+
+    return render_template('contest.html', cont=content)
 
 if __name__ == "__main__":
     app.run(debug=True)
