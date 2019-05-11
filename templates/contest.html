@@ -15,9 +15,9 @@
             <div class="inner">
                 <nav class="nav nav-masthead justify-content-left">
                     <a class="nav-link" href="#">Codeforces Local Virtual Contest</a>
-                    <a class="nav-link" href="#">History</a>
+                    <a class="nav-link" href="/history">History</a>
                     <a class="nav-link" href="/create">Create Contest</a>
-                    <a class="nav-link" href="#">Login</a>
+                    <a class="nav-link" href="/login">Login</a>
                 </nav>
             </div>
         </header>
@@ -39,12 +39,12 @@
                     {% for co in cont %}
                         {% if co.penalty == 0 and co.ac_time is none %}
                         <td>-</td>
-                        {% elif co.penalty != 0 %}
-                        <td><span class="result" id="penalty">({{ co.penalty }})</span></td>
+                        {% elif co.penalty != 0 and co.ac_time is not none %}
+                        <td><span class="result" id="ac_time">[{{ co.ac_time }}] </span><span class="result" id="penalty">({{ co.penalty }})</span></td>
                         {% elif co.ac_time is not none %}
                         <td><span class="result" id="ac_time">[{{ co.ac_time }}]</span></td>
                         {% else %}
-                        <td><span class="result" id="penalty">({{ co.penalty }})</span><span class="result" id="ac_time">[{{ co.ac_time or '' }}]</span></td>
+                        <td><span class="result" id="penalty">({{ co.penalty }})</span></td>
                         {% endif %}
                     {% endfor %}
                     <td>

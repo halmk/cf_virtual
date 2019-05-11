@@ -1,5 +1,7 @@
 from flask import *
 from sqlalchemy.sql import func
+from sqlalchemy import distinct
+from sqlalchemy import desc
 
 import hashlib
 import datetime
@@ -78,8 +80,10 @@ def createContest():
 
 @app.route('/history')
 def history():
-    res = "This page is for history of participated contest!"
-    return res
+    contests = session.query(pm.Problem.contest,pm.Problem.contestID,pm.Problem.start_time,pm.Problem.end_time)\
+        .distinct(pm.Problem.contest).order_by(desc(pm.Problem.contestID)).all()
+    
+    return render_template("history.html", cont=contests)
 
 @app.route('/contest/<contestID>', methods=["GET","POST"])
 def contest(contestID):
@@ -111,7 +115,7 @@ def contest(contestID):
         sub_time = sub_time.strftime('%Y-%m-%d %H:%M:%S')
         if sub_time > last_max:
             print(sub_time)
-            problem = str(sub["contestID"])+sub["problem"]["id"]
+            problem = str(sub["contestId"])+sub["problem"]["index"]
             update_pr = session.query(pm.Problem).filter(pm.Problem.contestID==contest_ID, pm.Problem.problem==problem).first()
             update_pr.last_updated = loc
             if sub["verdict"] == "OK":
@@ -138,4 +142,5 @@ def contest(contestID):
     return render_template('contest.html', cont=content, sum_time=sum_time, sum_penalty=sum_penalty)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    #app.run(debug=True)
+    app.run(debug=False, host='0.0.0.0')

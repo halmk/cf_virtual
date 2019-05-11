@@ -7,7 +7,7 @@
 
          <!-- Bootstrap core CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <link href="{{ url_for('static', filename='login.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='contest.css') }}" rel="stylesheet">
     </head>
 
     <body>
@@ -21,12 +21,22 @@
                 </nav>
             </div>
         </header>
+
         <div class="container">
-        <form action="/" method="POST">
-            <input type="text" value="" placeholder="Codeforces id" name="codeforcesID">
-            <input type="password" value="" placeholder="password" name="password">
-            <button type="submit">LOGIN</button>
-            </form>
+            <table border="1">
+                <tr>
+                    <th>Contest</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                </tr>
+                {% for co in cont %}
+                <tr>
+                    <td><a href="../contest/{{ co.contestID }}">{{ co.contest }}</a></td>
+                    <td>{{ co.start_time }}</td>
+                    <td>{{ co.end_time }}</td>
+                </tr>
+                {% endfor %}
+            </table>
         </div>
 
 
