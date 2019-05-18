@@ -15,21 +15,24 @@ import time
 
 app = Flask(__name__)
 
+# CFのSubmissionAPIから最新20件のSubmissionを取得します #
 def getSubmissionInfo():
     sub_url = "https://codeforces.com/api/user.status?handle=springroll&from=1&count=20"
     response = requests.get(sub_url)
     sub_data = json.loads(response.text)
     return sub_data["result"]
 
-
+# ホームページのURLが指定されたとき #
 @app.route('/')
 def home():
     return render_template('template.html')
 
+# ログインページのURLが指定されたとき #
 @app.route('/login')
 def login():
     return render_template('login.html')
 
+# コンテスト作成ページのURLが指定されたとき #
 @app.route('/create', methods=["GET", "POST"])
 def createContest():
     print("create contest page.")
@@ -42,18 +45,8 @@ def createContest():
         end_date = request.form["end_date"]
         end_time = request.form["end_time"]
         problems_url = request.form.getlist("problem_url")
-
-        print(contest_name)
-        print(start_date)
-        print(start_time)
-        print(end_date)
-        print(end_time)
-        for url in problems_url:
-            print(url)
-        
         pr = session.query(pm.Problem).all()
         
-
         res_mx = session.query(func.max(pm.Problem.contestID).label("max_contestid")).one()
         max_contestID = res_mx.max_contestid
         print(max_contestID)
@@ -78,13 +71,24 @@ def createContest():
         
         return redirect(url_for('contest', contestID=max_contestID))
 
-@app.route('/history')
+# コンテスト履歴ページのURLが指定されたとき #
+@app.route('/history', methods=["GET","POST"])
 def history():
-    contests = session.query(pm.Problem.contest,pm.Problem.contestID,pm.Problem.start_time,pm.Problem.end_time)\
-        .distinct(pm.Problem.contest).order_by(desc(pm.Problem.contestID)).all()
+    if request.method == "POST":
+        contest_ID = request.form["del"]
+        contest_ID = int(contest_ID)
+        print(contest_ID)
+        session.query(pm.Problem).filter(pm.Problem.contestID==contest_ID).delete()
+        session.commit()
+        print("delete finish.")
     
+    contests = session.query(pm.Problem.contest,pm.Problem.contestID,pm.Problem.start_time,pm.Problem.end_time)\
+            .distinct(pm.Problem.contest).order_by(desc(pm.Problem.contestID)).all()
+
     return render_template("history.html", cont=contests)
 
+
+# あるIDのコンテストページが指定されたとき #
 @app.route('/contest/<contestID>', methods=["GET","POST"])
 def contest(contestID):
     contest_ID = contestID
@@ -117,6 +121,14 @@ def contest(contestID):
             print(sub_time)
             problem = str(sub["contestId"])+sub["problem"]["index"]
             update_pr = session.query(pm.Problem).filter(pm.Problem.contestID==contest_ID, pm.Problem.problem==problem).first()
+            if update_pr is None:
+                continue
+            print(update_pr)
+            for key, value in sub.items():
+                print(str(key) +" "+ str(value))
+            if sub["passedTestCount"] == 0:
+                continue
+                
             update_pr.last_updated = loc
             if sub["verdict"] == "OK":
                 ac_diff = sub_epochtime - start_epoch
@@ -129,18 +141,65 @@ def contest(contestID):
             session.commit()
 
     content = session.query(pm.Problem).filter(pm.Problem.contestID==contest_ID).all()
-    sum_time = 0
+    max_time = 0
     sum_penalty = 0
     for con in content:
         if con.ac_time is not None:
-            sum_time += int(con.ac_time.split(':')[0])*60 + int(con.ac_time.split(':')[1])
+            max_time = max(max_time,int(con.ac_time.split(':')[0])*60+int(con.ac_time.split(':')[1]))
         sum_penalty += con.penalty
     
-    sum_time = "{:02}:{:02}".format(sum_time//60, sum_time%60)
+    max_time = "{:02}:{:02}".format(max_time//60, max_time%60)
 
     print("Complete.")
-    return render_template('contest.html', cont=content, sum_time=sum_time, sum_penalty=sum_penalty)
+    return render_template('contest.html', cont=content, sum_time=max_time, sum_penalty=sum_penalty)
 
+# コンテストの編集ページのURLが指定されたとき #
+@app.route('/modify/<contestID>', methods=["GET","POST"])
+def modify(contestID):
+    contest_ID = contestID
+
+    print("modify contest page.")
+    if request.method == "GET":
+        contents = session.query(pm.Problem).filter(pm.Problem.contestID==contest_ID).all()
+        return render_template("modify.html", cont=contents)
+
+    else:
+        print("modify this contest.")
+        session.query(pm.Problem).filter(pm.Problem.contestID==contest_ID).delete()
+        session.commit()
+
+        contest_name = request.form["contest_name"]
+        start_date = request.form["start_date"]
+        start_time = request.form["start_time"]
+        end_date = request.form["end_date"]
+        end_time = request.form["end_time"]
+        problems_url = request.form.getlist("problem_url")
+        pr = session.query(pm.Problem).all()
+                
+        for url in problems_url:
+            if len(url) == 0:
+                continue
+
+            pr = pm.Problem()
+            pr.problemURL = url
+            pr.problem = url.split('/')[5] + url.split('/')[6]
+            pr.contest = contest_name
+            pr.contestID = contest_ID
+            pr.participant = "springroll"
+            pr.start_time = start_date +" "+ start_time + ":00"
+            pr.end_time = end_date +" "+ end_time + ":00"
+            pr.penalty = 0
+            pr.last_updated = start_date +" "+ start_time + ":00"
+
+            print(url)
+
+            session.add(pr)
+            session.commit()
+
+        return redirect(url_for('contest', contestID=contest_ID))
+
+
+# 実行 #
 if __name__ == "__main__":
-    #app.run(debug=True)
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=True)
+    #app.run(debug=False, host='0.0.0.0')

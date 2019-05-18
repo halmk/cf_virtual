@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="jp">
     <head>
-        <meta charset="utf-8">
+        <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
-        <title>{{ title }}</title>
+        <title>History</title>
 
          <!-- Bootstrap core CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -28,12 +28,18 @@
                     <th>Contest</th>
                     <th>Start Time</th>
                     <th>End Time</th>
+                    <th></th>
                 </tr>
                 {% for co in cont %}
                 <tr>
                     <td><a href="../contest/{{ co.contestID }}">{{ co.contest }}</a></td>
                     <td>{{ co.start_time }}</td>
                     <td>{{ co.end_time }}</td>
+                    <td>
+                        <form action="/history" method="POST">
+                            <button type="submit" value="{{ co.contestID }}" name="del">Delete</button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </table>

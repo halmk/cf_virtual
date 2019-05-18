@@ -56,6 +56,10 @@ a {
     color: rgb(0, 105, 185);
 }
 
+.container .modify {
+    margin-left: 75%;
+}
+
 table {
     color: #444;
     width: 90%;

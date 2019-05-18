@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="jp">
     <head>
-        <meta charset="utf-8">
+        <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
-        <title>{{ title }}</title>
+        <title>{{ cont[0].contest }}</title>
 
          <!-- Bootstrap core CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -25,12 +25,14 @@
         <div class="container">
             <h1>{{ cont[0].contest }}</h1>
             <h2>{{ cont[0].start_time }} 〜 {{ cont[0].end_time }}</h2>
+            <hr>
+            <a class="modify" href="../modify/{{ cont[0].contestID }}">Edit this Contest.</a>
 
             <table border="1">
                 <tr>
                     <th>User name</th>
                     {% for co in cont %}
-                        <th><a href="{{ co.problemURL }}" target="_blank">{{ co.problem }}</a></th>
+                        <th><a class="problem" href="{{ co.problemURL }}" target="_blank">{{ co.problem }}</a></th>
                     {% endfor %}
                     <th>Score</th>
                 </tr>

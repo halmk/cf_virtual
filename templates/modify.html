@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
-        <title>Create Contest</title>
+        <title>Modify Contest</title>
 
          <!-- Bootstrap core CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -22,21 +22,23 @@
             </div>
         </header>
         <div class="container">
-        <form class="form-group" action="/create" method="POST">
+        <form class="form-group" action="/modify/{{ cont[0].contestID }}" method="POST">
         <p class="label">Contest Name<span class="req">*</span></p>
-        <input type="text" id="contest-name" value="" name="contest_name" required>
+        <input type="text" id="contest-name" value="{{ cont[0].contest }}" name="contest_name" required>
         <p class="label">Start Date<span class="req">*</span></p>
-        <input type="date" value="" name="start_date">
-        <input type="time" value="12:00" step="300" name="start_time">
+        <input type="date" value="{{ cont[0].start_time.strftime('%Y-%m-%d') }}" name="start_date">
+        <input type="time" value="{{ cont[0].start_time.strftime('%H:%M') }}" step="300" name="start_time">
         <p class="label">End Date<span class="req">*</span></p>
-        <input type="date" value="" name="end_date">
-        <input type="time" value="12:00" step="300" name="end_time">
+        <input type="date" value="{{ cont[0].end_time.strftime('%Y-%m-%d') }}" name="end_date">
+        <input type="time" value="{{ cont[0].end_time.strftime('%H:%M') }}" step="300" name="end_time">
         <p class="label">Problems<span class="req">*</span></p>
         <button type="button" id="add-button" onclick="add();">add</button>
         <div id="problems">
-            <input id="problem-url" type="text" value="" name="problem_url" placeholder="https://codeforces.com/problemset/problem/***/*" required>
+            {% for co in cont %}
+                <input id="problem-url" type="text" value="{{ co.problemURL }}" name="problem_url">
+            {% endfor %}
         </div>
-        <button type="submit" id="sub">Create</button>
+        <button type="submit" id="sub">Modify</button>
         </div>
         </form>
         </div>
